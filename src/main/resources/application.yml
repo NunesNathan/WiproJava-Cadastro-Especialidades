@@ -1,13 +1,14 @@
 server:
   port: 8080
 
-datasource:
-  plataform: mysql
-  url: jdbc:h2:mem:speciality_database
-  username: speciality-app
-  password: speciality-app!
+spring:
+  application:
+    name: speciality-app
+  datasource:
+    url: jdbc:h2:mem:speciality_database
+    username: speciality-app
+    password: speciality-app!
 
 logging:
-  INFO:
-    logging:
-      file: /logs/application-debug.log
+  file:
+    name: ./logs/speciality-app.log
