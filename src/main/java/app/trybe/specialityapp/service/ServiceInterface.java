@@ -1,21 +1,16 @@
 package app.trybe.specialityapp.service;
 
+import app.trybe.specialityapp.model.Professional;
+
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 public interface ServiceInterface<T, I extends Serializable> {
-  EntityManagerFactory emf =
-          Persistence.createEntityManagerFactory("com.trybe.acc.trybe.hibernate.specialityapp");
+  String save(T s);
 
-  void save(T s);
+  String update(T p, int id);
 
-  void update(T s);
-
-  void delete(I id);
+  String delete(int id);
 
   List<T> list();
-
-  T findById(I id);
 }

@@ -1,56 +1,66 @@
 package app.trybe.specialityapp.service;
 
+import app.trybe.specialityapp.commons.ApplicationError;
 import app.trybe.specialityapp.model.Professional;
+import app.trybe.specialityapp.repository.ProfessionalRepository;
 import java.util.List;
-import javax.persistence.EntityManager;
+import java.util.Optional;
+import javax.ws.rs.core.Response;
 import org.jvnet.hk2.annotations.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class ProfessionalService implements ServiceInterface<Professional, Integer> {
+  @Autowired
+  private ProfessionalRepository professionalRepository;
 
   @Override
-  public void save(Professional s) {
-    EntityManager em = emf.createEntityManager();
+  public String save(Professional p) {
+    if (p.getId() != null) {
+      throw new ApplicationError(Response.Status.BAD_REQUEST,
+              "Não é permitido inserir novos registros com ID explícito");
+    }
 
-    em.getTransaction().begin();
-    em.persist(s);
-    em.getTransaction().commit();
+    professionalRepository.save(p);
 
-    em.close();
+    return "Inserido";
   }
 
   @Override
-  public void update(Professional s) {
-    EntityManager em = emf.createEntityManager();
+  public String update(Professional p, int id) {
+    Optional<Professional> professional = professionalRepository.findById(id);
 
-    em.getTransaction().begin();
-    em.merge(s);
-    em.getTransaction().commit();
+    if (professional.isPresent()) {
+      professional.get().setProfessional(p);
 
-    em.close();
+      return String.format("ID [%d] atualizado", id);
+    }
+
+    throw new ApplicationError(Response.Status.NOT_FOUND,
+      "Não é possível editar, o ID informado não existe");
   }
 
   @Override
-  public void delete(Integer id) {
-    EntityManager em = emf.createEntityManager();
+  public String delete(int id) {
+    try {
+      professionalRepository.deleteById(id);
 
-    em.getTransaction().begin();
-    em.remove(em.find(Professional.class, id));
-    em.getTransaction().commit();
-
-    em.close();
+      return String.format("ID [%d] atualizado", id);
+    } catch (Error e) {
+      throw new ApplicationError(Response.Status.NOT_FOUND,
+              "Não é possível deletar, o ID informado não existe");
+    }
   }
 
   @Override
   public List<Professional> list() {
-    EntityManager em = emf.createEntityManager();
+    List<Professional> profs = professionalRepository.findAll();
 
-    return em.createQuery("SELECT P FROM Professional P", Professional.class).getResultList();
-  }
+    if (profs == null || profs.isEmpty()) {
+      throw new ApplicationError(Response.Status.NOT_FOUND,
+              "Nenhum registro foi encontrado!");
+    }
 
-  @Override
-  public Professional findById(Integer id) {
-    EntityManager em = emf.createEntityManager();
-    return em.find(Professional.class, id);
+    return profs;
   }
 }
