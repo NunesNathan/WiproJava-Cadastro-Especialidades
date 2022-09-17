@@ -19,12 +19,18 @@ public class Professional {
   @Column(name = "speciality")
   private String speciality;
 
-  public Integer getId() {
-    return id;
+  /** professional constructor for tests.*/
+  public Professional(Integer id, String name, String speciality) {
+    this.id = id;
+    this.name = name;
+    this.speciality = speciality;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
+  /** professional constructor.*/
+  public Professional() { }
+
+  public Integer getId() {
+    return id;
   }
 
   public String getName() {
