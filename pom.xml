@@ -10,6 +10,7 @@
 	<groupId>app.trybe</groupId>
 	<artifactId>speciality-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>cadastro-especialidades</name>
 
 	<!-- NÃO MODIFIQUE A CONFIGURAÇÃO JÁ INSERIDA PARA O DESAFIO-->
