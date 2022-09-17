@@ -1,7 +1,9 @@
 package app.trybe.specialityapp.controller;
 
+import app.trybe.specialityapp.commons.ApplicationError;
 import app.trybe.specialityapp.model.Professional;
 import app.trybe.specialityapp.service.ProfessionalService;
+import java.util.List;
 import java.util.NoSuchElementException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -11,12 +13,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 @Controller
-@Path("/api/professional")
+@Path("/professional")
 public class ProfessionalController {
   private final ProfessionalService service;
 
@@ -25,51 +28,74 @@ public class ProfessionalController {
     this.service = new ProfessionalService();
   }
 
+  /** insert path.*/
   @POST
-  @Consumes("application/json") // tipo de dado que é consumido
-  @Produces("application/json") // tipo de dado enviado como resposta
-  public Response insert(Professional professional) {
-    service.save(professional);
-    return Response.ok(professional).build();
+  @Path("/add")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response insert(Professional p) {
+    try {
+      String saved = service.save(p);
+
+      return Response.status(Response.Status.CREATED).entity(saved).build();
+    } catch (ApplicationError appError) {
+      System.out.println(appError.getStatus());
+      return Response.status(appError.getStatus())
+              .entity(appError)
+              .build();
+    }
   }
 
+  /** find all path.*/
   @GET
-  @Consumes("application/json")
-  @Produces("application/json")
+  @Path("/all")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response findAll() {
-    return Response.ok(service.list()).build();
+    try {
+      List<Professional> professionals = service.list();
+
+      return Response.status(Response.Status.OK).entity(professionals).build();
+    } catch (ApplicationError appError) {
+      System.out.println(appError.getStatus().getStatusCode());
+      return Response.status(appError.getStatus())
+              .entity(appError)
+              .build();
+    }
   }
 
   /** update book method.*/
   @PUT
-  @Path("/{id}")
-  @Consumes("application/json")
-  @Produces("application/json")
+  @Path("/edit/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response edit(@PathParam("id") Integer id, Professional toUpdate) {
     try {
-      Professional professional = service.list().stream()
-              .filter(p -> p.getId().equals(id)).findAny().orElseThrow();
+      String updated = service.update(toUpdate, id);
 
-      professional.setProfessional(toUpdate);
-
-      return Response.ok(professional).build();
-    } catch (NoSuchElementException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
+      return Response.status(Response.Status.OK).entity(updated).build();
+    } catch (ApplicationError appError) {
+      System.out.println(appError.getStatus());
+      return Response.status(appError.getStatus())
+              .entity(appError)
+              .build();
     }
   }
 
   /** delete book method.*/
   @DELETE
-  @Path("/{id}")
-  @Consumes("application/json")
-  @Produces("application/json")
+  @Path("/delete/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response delete(@PathParam("id") Integer id) {
     try {
-      service.delete(id);
+      String updated = service.delete(id);
 
-      return Response.status(Response.Status.NO_CONTENT).build();
-    } catch (NoSuchElementException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
+      return Response.status(Response.Status.OK).entity(updated).build();
+    } catch (ApplicationError appError) {
+      System.out.println(appError.getStatus());
+      return Response.status(appError.getStatus())
+              .entity(appError)
+              .build();
     }
   }
 }
