@@ -1,4 +1,0 @@
-ignore_files:
-  - src/test/
-  - mvnw
-  - .mvn/
